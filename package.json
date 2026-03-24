@@ -1,6 +1,6 @@
 {
   "name": "namechanger",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "文件批量重命名和内容替换工具 - CLI工具",
   "main": "./dist/index.js",
   "bin": {
