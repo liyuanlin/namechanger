@@ -1,0 +1,55 @@
+{
+  "name": "namechanger",
+  "version": "1.0.0",
+  "description": "文件批量重命名和内容替换工具 - CLI工具",
+  "main": "./dist/index.js",
+  "bin": {
+    "namechanger": "./dist/index.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tscWatch": "tsc -w",
+    "start": "tsc && node ./dist/index.js",
+    "distWatch": "nodemon ./dist/index.js",
+    "dev": "concurrently \"npm run tscWatch\" \"npm run distWatch\"",
+    "build": "tsc",
+    "prepare": "npm run build",
+    "clean": "rm -rf dist *.tgz",
+    "clean:win": "if exist dist rd /s /q dist && if exist *.tgz del /q *.tgz",
+    "prepack": "npm run build",
+    "pack": "npm pack",
+    "pack:local": "npm run clean && npm run build && npm pack",
+    "prepublishOnly": "npm run build && npm run check:registry",
+    "publish:npm": "npm publish",
+    "publish:public": "npm publish --access public",
+    "check:registry": "node -e \"const r=require;const s=r('child_process').execSync('npm config get registry').toString().trim();if(!s.includes('registry.npmjs.org')){console.error('错误: 当前 registry 不是 npm 官方源:',s);console.error('请使用: npm config set registry https://registry.npmjs.org');process.exit(1);}console.log('✓ registry 检查通过:',s);\"",
+    "release": "npm run clean && npm run build && npm version patch && npm publish",
+    "release:minor": "npm run clean && npm run build && npm version minor && npm publish",
+    "release:major": "npm run clean && npm run build && npm version major && npm publish"
+  },
+  "author": "liyuanlin138@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.5",
+    "@types/node": "^22.15.3",
+    "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "rename",
+    "replace",
+    "file",
+    "cli",
+    "tool"
+  ],
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ]
+}
