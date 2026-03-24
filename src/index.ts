@@ -32,9 +32,9 @@ const parseArgs = (): { configPath: string } => {
     }
 
     if (!configPath) {
-        console.error('错误: 请提供配置文件路径');
-        console.error('用法: namechanger -c <config.json>');
-        console.error('使用 -h 或 --help 查看帮助');
+        console.error('Error: Please provide configuration file path');
+        console.error('Usage: namechanger -c <config.json>');
+        console.error('Use -h or --help for help');
         process.exit(1);
     }
 
@@ -43,26 +43,26 @@ const parseArgs = (): { configPath: string } => {
 
 const showHelp = () => {
     console.log(`
-NameChanger - 文件批量重命名和内容替换工具
+NameChanger - Batch file renaming and content replacement tool
 
-用法:
+Usage:
   namechanger -c <config.json>
   namechanger --config <config.json>
 
-选项:
-  -c, --config <路径>  指定配置文件路径
-  -h, --help           显示帮助信息
+Options:
+  -c, --config <path>  Specify configuration file path
+  -h, --help           Show help information
 
-配置文件格式:
+Configuration format:
   {
-    "name": "项目名称",
+    "name": "project name",
     "version": "1.0.0",
-    "root": "目标目录路径",
-    "files": ["".sln", ".ts", ".js"],
+    "root": "target directory path",
+    "files": [".sln", ".ts", ".js"],
     "excludes": ["node_modules", ".git"],
     "replacements": [
-      { "regex": false, "old": "旧文本", "new": "新文本" },
-      { "regex": true, "old": "正则模式", "new": "替换文本" }
+      { "regex": false, "old": "old text", "new": "new text" },
+      { "regex": true, "old": "regex pattern", "new": "replacement text" }
     ]
   }
 `);
@@ -71,20 +71,52 @@ NameChanger - 文件批量重命名和内容替换工具
 const loadConfig = (configPath: string): Config => {
     const fullPath = path.resolve(configPath);
     if (!fs.existsSync(fullPath)) {
-        console.error(`错误: 配置文件不存在: ${fullPath}`);
+        console.error(`Error: Configuration file does not exist: ${fullPath}`);
         process.exit(1);
     }
     try {
         const content = fs.readFileSync(fullPath, 'utf-8');
         return JSON.parse(content) as Config;
     } catch (err) {
-        console.error(`错误: 无法解析配置文件: ${err}`);
+        console.error(`Error: Failed to parse configuration file: ${err}`);
+        process.exit(1);
+    }
+};
+
+const validateConfig = (config: Config): void => {
+    if (!config.root) {
+        console.error('Error: Missing root field in configuration file');
+        process.exit(1);
+    }
+
+    const rootPath = path.resolve(config.root);
+    if (!fs.existsSync(rootPath)) {
+        console.error(`Error: Specified root directory does not exist: ${rootPath}`);
+        console.error('Please check if the root path in configuration file is correct');
+        process.exit(1);
+    }
+
+    const stats = fs.statSync(rootPath);
+    if (!stats.isDirectory()) {
+        console.error(`Error: Specified root path is not a directory: ${rootPath}`);
+        process.exit(1);
+    }
+
+    if (!config.files || config.files.length === 0) {
+        console.error('Error: Missing files field or empty array in configuration file');
+        process.exit(1);
+    }
+
+    if (!config.replacements || config.replacements.length === 0) {
+        console.error('Error: Missing replacements field or empty array in configuration file');
         process.exit(1);
     }
 };
 
 const { configPath } = parseArgs();
 const config = loadConfig(configPath);
+validateConfig(config);
+
 const contentReplace = (srcValue: string, oldValue: string, newValue: string, isRegex: boolean): string => {
     if (isRegex) {
         return srcValue.replace(new RegExp(oldValue, 'g'), newValue);
@@ -101,7 +133,7 @@ const fileRename = async (allFiles: string[]) => {
             newPath = contentReplace(newPath, config.replacements[j].old, config.replacements[j].new, config.replacements[j].regex);
         }
         if (newPath != filePath) {
-            console.log('重命名文件：', filePath, '==>', newPath);
+            console.log('Renaming file:', filePath, '==>', newPath);
             await renameFile(filePath, newPath, { overwrite: true })
         }
         newFiles.push(newPath);
@@ -115,7 +147,7 @@ const fileContentReplace = (allFiles: string[]) => {
         for (let i = 0; i < config.replacements.length; i++) {
             let content = getFileContent(filePath);
             let newContent = contentReplace(content, config.replacements[i].old, config.replacements[i].new, config.replacements[i].regex)
-            console.log('替换文件', filePath);
+            console.log('Replacing content in file:', filePath);
             writeFile(filePath, newContent);
         }
     }
@@ -137,5 +169,5 @@ const start = async () => {
 } 
 
 start().then(()=>{
-     console.log('替换完成')
+     console.log('Replacement completed')
 });

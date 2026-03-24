@@ -4,15 +4,15 @@ import fsp from 'fs/promises';
 import path from 'path';
 export function getFileExtension(filename: string) {
     const lastDotIndex = filename.lastIndexOf('.');
-    if (lastDotIndex === -1) return ''; // 如果没有找到'.'，返回空字符串
+    if (lastDotIndex === -1) return ''; // Return empty string if no dot found
     return '.' + filename.substring(lastDotIndex + 1).toLocaleLowerCase();
 }
 
 /**
- * 遍历指定目录的全部文件，同时忽略指定的目录
- * @param dirPath 要遍历的目录路径
- * @param ignoreDirs 要忽略的目录列表
- * @returns 文件路径的数组
+ * Traverse all files in specified directory while ignoring specified directories
+ * @param dirPath Directory path to traverse
+ * @param ignoreDirs List of directories to ignore
+ * @returns Array of file paths
  */
 export function getAllFiles(dirPath: string, exts: string[], ignoreDirs: string[] = ['node_modules']): string[] {
     let files: string[] = [];
@@ -23,14 +23,14 @@ export function getAllFiles(dirPath: string, exts: string[], ignoreDirs: string[
         for (const item of items) {
             const fullPath = path.join(dir, item.name);
             if (item.isDirectory()) {
-                // 如果目录在忽略列表中，则跳过
+                // Skip if directory is in ignore list
                 if (ignoreDirs.includes(item.name)) {
                     continue;
                 }
-                // 递归读取子目录
+                // Recursively read subdirectories
                 readDirectory(fullPath);
             } else if (item.isFile()) {
-                // 收集文件路径
+                // Collect file paths
                 var ext = getFileExtension(item.name);
                 if (exts.indexOf(ext) !== -1)
                     files.push(fullPath);
@@ -52,12 +52,12 @@ export function writeFile(path: string, content: string) {
 function textToCamelCaseVariable(text: string): string {
     let fullText = text
         .toLowerCase()
-        .replace(/[^a-zA-Z0-9]+/g, '_') // 非字母数字替换为下划线
-        .replace(/^_+/, '')             // 移除开头的下划线
-        .replace(/_+$/, '')             // 移除结尾的下划线
-        .replace(/_+([a-z])/g, (_, c) => c.toUpperCase()) // 下划线后字母大写
-        .replace(/^(\d)/, '_$1')        // 数字开头前面加下划线
-        || 'text'; // 确保非空
+        .replace(/[^a-zA-Z0-9]+/g, '_') // Replace non-alphanumeric chars with underscore
+        .replace(/^_+/, '')             // Remove leading underscores
+        .replace(/_+$/, '')             // Remove trailing underscores
+        .replace(/_+([a-z])/g, (_, c) => c.toUpperCase()) // Uppercase letter after underscore
+        .replace(/^(\d)/, '_$1')        // Add underscore before leading digit
+        || 'text'; // Ensure non-empty
     if(fullText.length>10){
         for (let i = 0;i<fullText.length ; i++) {
             if(fullText[i]=='_'){
@@ -70,22 +70,22 @@ function textToCamelCaseVariable(text: string): string {
 export function englishToKeyword(filePath: string, english: string): string {
     let removeWords = ['pages', 'views', 'components'];
     let replaceToWords = ['page', 'view', 'component']
-    // 1. 获取文件名（不带扩展名） 和目录
+    // 1. Get filename (without extension) and directory
     const { name, dir } = path.parse(filePath);
     let dirValues = dir.replaceAll('\\', '/').split('/');
-    // 2. 从目录中找到有总结意义的词语
+    // 2. Find meaningful words from directory structure
     let selectedPart: string[] = [];
     for (let i = dirValues.length - 1; i >= 0; i--) {
         let found = false;
         var partValue = dirValues[i].toLowerCase()
-        .replace(/[^a-zA-Z0-9_]/g, '_') // 替换所有非字母数字字符为下划线
-        .replace(/^_+/, '')             // 移除开头的下划线
-        .replace(/_+$/, '')             // 移除结尾的下划线
-        .replace(/_+/g, '_');           // 将多个连续下划线合并为一个;
+        .replace(/[^a-zA-Z0-9_]/g, '_') // Replace all non-alphanumeric chars with underscore
+        .replace(/^_+/, '')             // Remove leading underscores
+        .replace(/_+$/, '')             // Remove trailing underscores
+        .replace(/_+/g, '_');           // Merge consecutive underscores
         if (/^[0-9]/.test(partValue)) {
             continue;
         }
-        if(partValue=='src'){//可能还有其他的上溯到根目录的情况，这里暂时只出来到了src目录
+        if(partValue=='src'){// Stop at src directory (could extend for other root markers)
             break;
         }
         for (let j = 0; j < removeWords.length; j++) {
@@ -99,16 +99,16 @@ export function englishToKeyword(filePath: string, english: string): string {
         if (!found) {
             selectedPart.push(partValue);
         }
-        if (selectedPart.length > 1) break;//allow two level
+        if (selectedPart.length > 1) break;// Allow two levels
     }
-    // 3. 处理文件名特殊字符和分隔符
+    // 3. Process filename special characters and separators
     let variableName = name
-        .replace(/[^a-zA-Z0-9_]/g, '_') // 替换所有非字母数字字符为下划线
-        .replace(/^_+/, '')             // 移除开头的下划线
-        .replace(/_+$/, '')             // 移除结尾的下划线
-        .replace(/_+/g, '_');           // 将多个连续下划线合并为一个
+        .replace(/[^a-zA-Z0-9_]/g, '_') // Replace all non-alphanumeric chars with underscore
+        .replace(/^_+/, '')             // Remove leading underscores
+        .replace(/_+$/, '')             // Remove trailing underscores
+        .replace(/_+/g, '_');           // Merge consecutive underscores
 
-    // 4. 如果结果为空字符串，使用默认值
+    // 4. Use default if result is empty
     if (!variableName) {
         variableName = '';
     }
@@ -117,18 +117,18 @@ export function englishToKeyword(filePath: string, english: string): string {
 
 
 export interface RenameOptions {
-  /** 是否覆盖已存在的目标文件（默认：false） */
+  /** Whether to overwrite existing target file (default: false) */
   overwrite?: boolean;
-  /** 创建目标目录时使用的权限模式（默认：0o777 & ~process.umask()） */
+  /** Permission mode when creating target directory (default: 0o777 & ~process.umask()) */
   mode?: number;
 }
 
 
 /**
- * 修改文件名及路径的函数
- * @param oldPath - 原始文件路径（必须存在）
- * @param newPath - 新文件路径（可包含新目录和文件名）
- * @param options - 可选配置项
+ * Function to rename file and modify path
+ * @param oldPath - Original file path (must exist)
+ * @param newPath - New file path (can include new directory and filename)
+ * @param options - Optional configuration
  * @returns Promise<void>
  */
 export async function renameFile(
@@ -140,40 +140,40 @@ export async function renameFile(
   const newDir = path.dirname(newPath);
  
   try {
-    // 1. 确保目标目录存在
+    // 1. Ensure target directory exists
     await ensureDirectoryExists(newDir, { mode });
- 
-    // 2. 检查目标文件是否存在
+
+    // 2. Check if target file exists
     let stats: fs.Stats | undefined;
     try {
       stats = await fsp.stat(newPath);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-        throw new Error(`检查目标文件时出错: ${(error as Error).message}`);
+        throw new Error(`Error checking target file: ${(error as Error).message}`);
       }
     }
- 
-    // 3. 处理文件覆盖逻辑
+
+    // 3. Handle file overwrite logic
     if (stats && stats.isFile()) {
       if (!overwrite) {
-        throw new Error(`目标文件已存在: ${newPath}`);
+        throw new Error(`Target file already exists: ${newPath}`);
       }
-      // 删除已存在的文件
+      // Delete existing file
       await fsp.unlink(newPath);
     }
- 
-    // 4. 执行重命名操作
+
+    // 4. Execute rename operation
     await fsp.rename(oldPath, newPath);
   } catch (error) {
-    // 统一错误处理
-    throw new Error(`文件操作失败: ${(error as Error).message}`);
+    // Unified error handling
+    throw new Error(`File operation failed: ${(error as Error).message}`);
   }
 }
  
 /**
- * 确保目录存在的工具函数
- * @param dirPath - 目标目录路径
- * @param options - 配置项
+ * Utility function to ensure directory exists
+ * @param dirPath - Target directory path
+ * @param options - Configuration options
  */
 async function ensureDirectoryExists(
   dirPath: string,
@@ -187,7 +187,7 @@ async function ensureDirectoryExists(
   } catch (error) {
     const err = error as NodeJS.ErrnoException;
     if (err.code !== 'EEXIST') {
-      throw new Error(`创建目录失败: ${err.code} - ${err.message}`);
+      throw new Error(`Failed to create directory: ${err.code} - ${err.message}`);
     }
   }
 }
