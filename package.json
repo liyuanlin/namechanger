@@ -28,6 +28,14 @@
     "release:minor": "npm run clean && npm run build && npm version minor && npm publish",
     "release:major": "npm run clean && npm run build && npm version major && npm publish"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liyuanlin/namechanger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/liyuanlin/namechanger/issues"
+  },
+  "homepage": "https://github.com/liyuanlin/namechanger#readme",
   "author": "liyuanlin138@gmail.com",
   "license": "MIT",
   "devDependencies": {
@@ -50,6 +58,7 @@
   ],
   "files": [
     "dist/**/*",
-    "README.md"
+    "README.md",
+    "README_EN.md"
   ]
 }
