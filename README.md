@@ -9,7 +9,7 @@
 ### 全局安装
 
 ```bash
-npm install -g namechanger
+npm install -g @liyuanlin/namechanger
 ```
 
 ### 本地开发安装

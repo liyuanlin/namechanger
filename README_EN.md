@@ -9,7 +9,7 @@ A CLI tool for batch file renaming and content replacement - supports both regul
 ### Global Installation
 
 ```bash
-npm install -g namechanger
+npm install -g @liyuanlin/namechanger
 ```
 
 ### Local Development
