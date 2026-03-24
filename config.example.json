@@ -1,0 +1,28 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "root": "C:/projects/example-project",
+  "files": [
+    "", ".sln", ".ps1", ".yml", ".md", ".css", ".scss", ".js", ".ts", ".html", ".cshtml"
+  ],
+  "excludes": [
+    "node_modules", ".git", ".vscode", "dist", ".idea", ".vs"
+  ],
+  "replacements": [
+    {
+      "regex": false,
+      "old": "src/",
+      "new": "dist/"
+    },
+    {
+      "regex": false,
+      "old": "src\\",
+      "new": "dist\\"
+    },
+    {
+      "regex": false,
+      "old": "OldProjectName",
+      "new": "NewProjectName"
+    }
+  ]
+}
