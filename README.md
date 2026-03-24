@@ -20,6 +20,47 @@ npm run build
 npm link
 ```
 
+## 开发命令
+
+### 打包命令
+
+```bash
+# 打包（生成 tgz 文件，用于本地测试）
+npm run pack
+
+# 完整打包（清理 + 构建 + 打包）
+npm run pack:local
+```
+
+### 发布命令
+
+```bash
+# 发布到 npm（自动检查 registry）
+npm run publish:npm
+
+# 发布公开包（Scoped 包需要）
+npm run publish:public
+
+# 一键发布补丁版本（清理 + 构建 + 版本号 + 1 + 发布）
+npm run release
+
+# 发布次要版本（1.0.0 -> 1.1.0）
+npm run release:minor
+
+# 发布主要版本（1.0.0 -> 2.0.0）
+npm run release:major
+```
+
+### 清理命令
+
+```bash
+# Linux/Mac
+npm run clean
+
+# Windows
+npm run clean:win
+```
+
 ## 使用方法
 
 ### 基本用法
