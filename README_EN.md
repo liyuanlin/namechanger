@@ -47,20 +47,23 @@ npm run pack:local
 ### Publish Commands
 
 ```bash
-# Publish to npm (auto-checks registry)
+# Quick publish patch version (1.0.0 -> 1.0.1)
 npm run publish:npm
+
+# Quick publish minor version (1.0.0 -> 1.1.0)
+npm run publish:minor
+
+# Quick publish major version (1.0.0 -> 2.0.0)
+npm run publish:major
+
+# Full release workflow (clean + build + version bump + publish)
+npm run release
 
 # Publish public package (for scoped packages)
 npm run publish:public
 
-# One-click release patch version (clean + build + version + publish)
-npm run release
-
-# Release minor version (1.0.0 -> 1.1.0)
-npm run release:minor
-
-# Release major version (1.0.0 -> 2.0.0)
-npm run release:major
+# Publish with current version (not recommended, only if version already manually updated)
+npm run publish:current
 ```
 
 ### Clean Commands

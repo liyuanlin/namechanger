@@ -21,12 +21,15 @@
     "pack": "npm pack",
     "pack:local": "npm run clean && npm run build && npm pack",
     "prepublishOnly": "npm run build && npm run check:registry",
-    "publish:npm": "npm publish",
-    "publish:public": "npm publish --access public",
-    "check:registry": "node -e \"const r=require;const s=r('child_process').execSync('npm config get registry').toString().trim();if(!s.includes('registry.npmjs.org')){console.error('错误: 当前 registry 不是 npm 官方源:',s);console.error('请使用: npm config set registry https://registry.npmjs.org');process.exit(1);}console.log('✓ registry 检查通过:',s);\"",
-    "release": "npm run clean && npm run build && npm version patch && npm publish",
-    "release:minor": "npm run clean && npm run build && npm version minor && npm publish",
-    "release:major": "npm run clean && npm run build && npm version major && npm publish"
+    "publish:npm": "npm version patch && npm publish",
+    "publish:public": "npm version patch && npm publish --access public",
+    "publish:minor": "npm version minor && npm publish",
+    "publish:major": "npm version major && npm publish",
+    "publish:current": "npm publish",
+    "check:registry": "node -e \"const r=require;const s=r('child_process').execSync('npm config get registry').toString().trim();if(!s.includes('registry.npmjs.org')){console.error('Error: Current registry is not npm official:',s);console.error('Please use: npm config set registry https://registry.npmjs.org');process.exit(1);}console.log('✓ Registry check passed:',s);\"",
+    "release": "npm run clean && npm run build && npm run publish:npm",
+    "release:minor": "npm run clean && npm run build && npm run publish:minor",
+    "release:major": "npm run clean && npm run build && npm run publish:major"
   },
   "repository": {
     "type": "git",

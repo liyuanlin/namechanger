@@ -37,20 +37,23 @@ npm run pack:local
 ### 发布命令
 
 ```bash
-# 发布到 npm（自动检查 registry）
+# 快速发布补丁版本 (1.0.0 -> 1.0.1)
 npm run publish:npm
 
-# 发布公开包（Scoped 包需要）
-npm run publish:public
+# 快速发布次要版本 (1.0.0 -> 1.1.0)
+npm run publish:minor
 
-# 一键发布补丁版本（清理 + 构建 + 版本号 + 1 + 发布）
+# 快速发布主要版本 (1.0.0 -> 2.0.0)
+npm run publish:major
+
+# 完整发布流程 (清理 + 构建 + 版本递增 + 发布)
 npm run release
 
-# 发布次要版本（1.0.0 -> 1.1.0）
-npm run release:minor
+# 发布公开包 (Scoped 包需要)
+npm run publish:public
 
-# 发布主要版本（1.0.0 -> 2.0.0）
-npm run release:major
+# 使用当前版本号发布 (不推荐，仅当版本号已手动更新时)
+npm run publish:current
 ```
 
 ### 清理命令
