@@ -8,6 +8,7 @@
   "excludes": [
     "node_modules", ".git", ".vscode", "dist", ".idea", ".vs"
   ],
+  "renameOnly": false,
   "replacements": [
     {
       "regex": false,

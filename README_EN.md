@@ -90,6 +90,25 @@ namechanger -c config.json
 namechanger --help
 ```
 
+### View Version
+
+```bash
+namechanger --version
+```
+
+### Rename Only (Skip Content Replacement)
+
+```bash
+# Use command line option
+namechanger -c config.json --rename-only
+
+# Or set in configuration file
+{
+  "renameOnly": true,
+  ...
+}
+```
+
 ## Configuration
 
 Create a JSON configuration file to define replacement rules:
@@ -125,6 +144,7 @@ Create a JSON configuration file to define replacement rules:
 | `root` | string | **Yes** | Root directory path to process |
 | `files` | string[] | **Yes** | List of file extensions to process (e.g.: `[".ts", ".js"]`). Use `""` for files without extension. |
 | `excludes` | string[] | No | List of directory names to exclude |
+| `renameOnly` | boolean | No | Only rename files, skip content replacement (default: false) |
 | `replacements` | array | **Yes** | Array of replacement rules |
 
 ### Replacement Rules

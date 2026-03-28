@@ -4,6 +4,17 @@ import { getAllFiles, getFileContent, renameFile, writeFile } from './tools/file
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Get version from package.json
+const getVersion = (): string => {
+    try {
+        const packageJsonPath = path.join(__dirname, '..', 'package.json');
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+        return packageJson.version || 'unknown';
+    } catch {
+        return 'unknown';
+    }
+};
+
 interface Config {
     name: string;
     version: string;
@@ -15,11 +26,18 @@ interface Config {
         old: string;
         new: string;
     }>;
+    renameOnly?: boolean;
 }
 
-const parseArgs = (): { configPath: string } => {
+interface ParsedArgs {
+    configPath: string;
+    renameOnly: boolean;
+}
+
+const parseArgs = (): ParsedArgs => {
     const args = process.argv.slice(2);
     let configPath = '';
+    let renameOnly = false;
 
     for (let i = 0; i < args.length; i++) {
         if (args[i] === '-c' || args[i] === '--config') {
@@ -28,6 +46,11 @@ const parseArgs = (): { configPath: string } => {
         } else if (args[i] === '-h' || args[i] === '--help') {
             showHelp();
             process.exit(0);
+        } else if (args[i] === '-v' || args[i] === '--version') {
+            console.log(`namechanger v${getVersion()}`);
+            process.exit(0);
+        } else if (args[i] === '-r' || args[i] === '--rename-only') {
+            renameOnly = true;
         }
     }
 
@@ -38,7 +61,7 @@ const parseArgs = (): { configPath: string } => {
         process.exit(1);
     }
 
-    return { configPath };
+    return { configPath, renameOnly };
 };
 
 const showHelp = () => {
@@ -50,8 +73,10 @@ Usage:
   namechanger --config <config.json>
 
 Options:
-  -c, --config <path>  Specify configuration file path
-  -h, --help           Show help information
+  -c, --config <path>   Specify configuration file path
+  -h, --help            Show help information
+  -v, --version         Show version number
+  -r, --rename-only     Only rename files, do not replace file content
 
 Configuration format:
   {
@@ -60,11 +85,14 @@ Configuration format:
     "root": "target directory path",
     "files": [".sln", ".ts", ".js"],
     "excludes": ["node_modules", ".git"],
+    "renameOnly": false,
     "replacements": [
       { "regex": false, "old": "old text", "new": "new text" },
       { "regex": true, "old": "regex pattern", "new": "replacement text" }
     ]
   }
+
+Note: renameOnly can be set in config file or via -r/--rename-only command line option.
 `);
 };
 
@@ -113,9 +141,12 @@ const validateConfig = (config: Config): void => {
     }
 };
 
-const { configPath } = parseArgs();
+const { configPath, renameOnly: cmdRenameOnly } = parseArgs();
 const config = loadConfig(configPath);
 validateConfig(config);
+
+// Command line option takes precedence over config file
+const renameOnly = cmdRenameOnly || config.renameOnly || false;
 
 const contentReplace = (srcValue: string, oldValue: string, newValue: string, isRegex: boolean): string => {
     if (isRegex) {
@@ -165,9 +196,14 @@ const start = async () => {
     );
 
     let newFiles = await fileRename(allFiles);
-    fileContentReplace(newFiles);
-} 
+
+    if (!renameOnly) {
+        fileContentReplace(newFiles);
+    } else {
+        console.log('Skipping content replacement (rename-only mode)');
+    }
+}
 
 start().then(()=>{
-     console.log('Replacement completed')
+     console.log(renameOnly ? 'File renaming completed' : 'Replacement completed')
 });
