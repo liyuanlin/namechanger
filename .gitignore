@@ -1,5 +1,7 @@
 node_modules
 .claude
+.claude.start.txt
 *.tgz
 config.json
 dist
+.npmrc
