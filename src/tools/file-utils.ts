@@ -191,3 +191,65 @@ async function ensureDirectoryExists(
     }
   }
 }
+
+/**
+ * Remove empty directories recursively
+ * @param dirPath - Root directory path to scan
+ * @param ignoreDirs - List of directory names to ignore
+ * @returns number of directories removed
+ */
+export function removeEmptyDirectories(
+  dirPath: string,
+  ignoreDirs: string[] = ['node_modules', '.git']
+): number {
+  let removedCount = 0;
+
+  const removeEmpty = (dir: string): boolean => {
+    // Check if this directory should be ignored
+    const dirName = path.basename(dir);
+    if (ignoreDirs.includes(dirName)) {
+      return false;
+    }
+
+    try {
+      const items = fs.readdirSync(dir, { withFileTypes: true });
+      let isEmpty = true;
+
+      for (const item of items) {
+        const fullPath = path.join(dir, item.name);
+        if (item.isDirectory()) {
+          // Recursively check subdirectory
+          const subDirRemoved = removeEmpty(fullPath);
+          if (!subDirRemoved) {
+            // Subdirectory was not removed (not empty or was ignored)
+            isEmpty = false;
+          }
+        } else {
+          // There's a file, so directory is not empty
+          isEmpty = false;
+        }
+      }
+
+      // If directory is empty and not the root path, remove it
+      if (isEmpty && dir !== dirPath) {
+        try {
+          fs.rmdirSync(dir);
+          console.log('Removed empty directory:', dir);
+          removedCount++;
+          return true;
+        } catch (err) {
+          console.error('Failed to remove directory:', dir, (err as Error).message);
+          return false;
+        }
+      }
+
+      return false;
+    } catch (err) {
+      console.error('Error reading directory:', dir, (err as Error).message);
+      return false;
+    }
+  };
+
+  removeEmpty(dirPath);
+  return removedCount;
+}

@@ -99,6 +99,19 @@ namechanger -c config.json --rename-only
 }
 ```
 
+### 移除空目录
+
+```bash
+# 使用命令行参数
+namechanger -c config.json --remove-empty-dirs
+
+# 或在配置文件中设置
+{
+  "removeEmptyDirs": true,
+  ...
+}
+```
+
 ## 配置文件
 
 创建一个 JSON 配置文件来定义替换规则：
@@ -135,6 +148,7 @@ namechanger -c config.json --rename-only
 | `files` | string[] | **是** | 要处理的文件扩展名列表（例如：`[".ts", ".js"]`） |
 | `excludes` | string[] | 否 | 要排除的目录名列表 |
 | `renameOnly` | boolean | 否 | 仅重命名文件，不替换文件内容（默认：false） |
+| `removeEmptyDirs` | boolean | 否 | 完成后移除空目录（默认：false） |
 | `replacements` | array | **是** | 替换规则数组 |
 
 ### 替换规则

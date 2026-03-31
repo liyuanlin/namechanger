@@ -109,6 +109,19 @@ namechanger -c config.json --rename-only
 }
 ```
 
+### Remove Empty Directories
+
+```bash
+# Use command line option
+namechanger -c config.json --remove-empty-dirs
+
+# Or set in configuration file
+{
+  "removeEmptyDirs": true,
+  ...
+}
+```
+
 ## Configuration
 
 Create a JSON configuration file to define replacement rules:
@@ -145,6 +158,7 @@ Create a JSON configuration file to define replacement rules:
 | `files` | string[] | **Yes** | List of file extensions to process (e.g.: `[".ts", ".js"]`). Use `""` for files without extension. |
 | `excludes` | string[] | No | List of directory names to exclude |
 | `renameOnly` | boolean | No | Only rename files, skip content replacement (default: false) |
+| `removeEmptyDirs` | boolean | No | Remove empty directories after processing (default: false) |
 | `replacements` | array | **Yes** | Array of replacement rules |
 
 ### Replacement Rules

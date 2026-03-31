@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import chokidar from 'chokidar';
-import { getAllFiles, getFileContent, renameFile, writeFile } from './tools/file-utils';
+import { getAllFiles, getFileContent, renameFile, writeFile, removeEmptyDirectories } from './tools/file-utils';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -27,17 +27,20 @@ interface Config {
         new: string;
     }>;
     renameOnly?: boolean;
+    removeEmptyDirs?: boolean;
 }
 
 interface ParsedArgs {
     configPath: string;
     renameOnly: boolean;
+    removeEmptyDirs: boolean;
 }
 
 const parseArgs = (): ParsedArgs => {
     const args = process.argv.slice(2);
     let configPath = '';
     let renameOnly = false;
+    let removeEmptyDirs = false;
 
     for (let i = 0; i < args.length; i++) {
         if (args[i] === '-c' || args[i] === '--config') {
@@ -51,6 +54,8 @@ const parseArgs = (): ParsedArgs => {
             process.exit(0);
         } else if (args[i] === '-r' || args[i] === '--rename-only') {
             renameOnly = true;
+        } else if (args[i] === '--remove-empty-dirs') {
+            removeEmptyDirs = true;
         }
     }
 
@@ -61,7 +66,7 @@ const parseArgs = (): ParsedArgs => {
         process.exit(1);
     }
 
-    return { configPath, renameOnly };
+    return { configPath, renameOnly, removeEmptyDirs };
 };
 
 const showHelp = () => {
@@ -77,6 +82,7 @@ Options:
   -h, --help            Show help information
   -v, --version         Show version number
   -r, --rename-only     Only rename files, do not replace file content
+  --remove-empty-dirs   Remove empty directories after renaming
 
 Configuration format:
   {
@@ -86,13 +92,16 @@ Configuration format:
     "files": [".sln", ".ts", ".js"],
     "excludes": ["node_modules", ".git"],
     "renameOnly": false,
+    "removeEmptyDirs": false,
     "replacements": [
       { "regex": false, "old": "old text", "new": "new text" },
       { "regex": true, "old": "regex pattern", "new": "replacement text" }
     ]
   }
 
-Note: renameOnly can be set in config file or via -r/--rename-only command line option.
+Note:
+  - renameOnly can be set in config file or via -r/--rename-only command line option.
+  - removeEmptyDirs can be set in config file or via --remove-empty-dirs command line option.
 `);
 };
 
@@ -141,12 +150,13 @@ const validateConfig = (config: Config): void => {
     }
 };
 
-const { configPath, renameOnly: cmdRenameOnly } = parseArgs();
+const { configPath, renameOnly: cmdRenameOnly, removeEmptyDirs: cmdRemoveEmptyDirs } = parseArgs();
 const config = loadConfig(configPath);
 validateConfig(config);
 
-// Command line option takes precedence over config file
+// Command line options take precedence over config file
 const renameOnly = cmdRenameOnly || config.renameOnly || false;
+const shouldRemoveEmptyDirs = cmdRemoveEmptyDirs || config.removeEmptyDirs || false;
 
 const contentReplace = (srcValue: string, oldValue: string, newValue: string, isRegex: boolean): string => {
     if (isRegex) {
@@ -201,6 +211,17 @@ const start = async () => {
         fileContentReplace(newFiles);
     } else {
         console.log('Skipping content replacement (rename-only mode)');
+    }
+
+    // Remove empty directories if enabled
+    if (shouldRemoveEmptyDirs) {
+        console.log('Scanning for empty directories...');
+        const removedCount = removeEmptyDirectories(config.root, config.excludes);
+        if (removedCount > 0) {
+            console.log(`Removed ${removedCount} empty director${removedCount === 1 ? 'y' : 'ies'}`);
+        } else {
+            console.log('No empty directories found');
+        }
     }
 }
 
