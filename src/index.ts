@@ -28,6 +28,7 @@ interface Config {
     }>;
     renameOnly?: boolean;
     removeEmptyDirs?: boolean;
+    binaryExtensions?: string[];
 }
 
 interface ParsedArgs {
@@ -93,6 +94,7 @@ Configuration format:
     "excludes": ["node_modules", ".git"],
     "renameOnly": false,
     "removeEmptyDirs": false,
+    "binaryExtensions": [".exe", ".dll", ".png", ".jpg"],
     "replacements": [
       { "regex": false, "old": "old text", "new": "new text" },
       { "regex": true, "old": "regex pattern", "new": "replacement text" }
@@ -102,6 +104,7 @@ Configuration format:
 Note:
   - renameOnly can be set in config file or via -r/--rename-only command line option.
   - removeEmptyDirs can be set in config file or via --remove-empty-dirs command line option.
+  - binaryExtensions: specify file extensions to skip content replacement (renaming still applies).
 `);
 };
 
@@ -182,9 +185,30 @@ const fileRename = async (allFiles: string[]) => {
     return newFiles;
 }
 
+const getFileExtension = (filename: string): string => {
+    const lastDotIndex = filename.lastIndexOf('.');
+    if (lastDotIndex === -1) return '';
+    return filename.substring(lastDotIndex).toLowerCase();
+};
+
+const isBinaryFile = (filePath: string): boolean => {
+    if (!config.binaryExtensions || config.binaryExtensions.length === 0) {
+        return false;
+    }
+    const ext = getFileExtension(filePath);
+    return config.binaryExtensions.includes(ext);
+};
+
 const fileContentReplace = (allFiles: string[]) => {
     for (let i = 0; i < allFiles.length; i++) {
         let filePath = allFiles[i];
+
+        // Skip binary files
+        if (isBinaryFile(filePath)) {
+            console.log('Skipping binary file:', filePath);
+            continue;
+        }
+
         for (let i = 0; i < config.replacements.length; i++) {
             let content = getFileContent(filePath);
             let newContent = contentReplace(content, config.replacements[i].old, config.replacements[i].new, config.replacements[i].regex)

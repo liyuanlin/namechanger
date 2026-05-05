@@ -133,6 +133,9 @@ Create a JSON configuration file to define replacement rules:
   "root": "C:/projects/my-project",
   "files": [".sln", ".ps1", ".yml", ".md", ".css", ".scss", ".js", ".ts", ".html", ".cshtml"],
   "excludes": ["node_modules", ".git", ".vscode", "dist", ".idea", ".vs"],
+  "renameOnly": false,
+  "removeEmptyDirs": false,
+  "binaryExtensions": [".exe", ".dll", ".png", ".jpg", ".pdf"],
   "replacements": [
     {
       "regex": false,
@@ -159,6 +162,7 @@ Create a JSON configuration file to define replacement rules:
 | `excludes` | string[] | No | List of directory names to exclude |
 | `renameOnly` | boolean | No | Only rename files, skip content replacement (default: false) |
 | `removeEmptyDirs` | boolean | No | Remove empty directories after processing (default: false) |
+| `binaryExtensions` | string[] | No | Binary file extensions to skip content replacement (default: []) |
 | `replacements` | array | **Yes** | Array of replacement rules |
 
 ### Replacement Rules
@@ -175,9 +179,11 @@ Each replacement rule contains the following fields:
 
 - **File Renaming**: Batch rename files according to replacement rules
 - **Content Replacement**: Find and replace text within file contents
+- **Binary File Protection**: Automatically skip content replacement for binary files
 - **Regex Support**: Support for complex matching using regular expressions
 - **Path Handling**: Correctly handles both Windows and Unix path separators
 - **Safe Exclusions**: Automatically excludes node_modules, .git, and other directories
+- **Remove Empty Directories**: Automatically clean up empty directories after processing
 
 ## Examples
 

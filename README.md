@@ -123,6 +123,9 @@ namechanger -c config.json --remove-empty-dirs
   "root": "C:/projects/my-project",
   "files": [".sln", ".ps1", ".yml", ".md", ".css", ".scss", ".js", ".ts", ".html", ".cshtml"],
   "excludes": ["node_modules", ".git", ".vscode", "dist", ".idea", ".vs"],
+  "renameOnly": false,
+  "removeEmptyDirs": false,
+  "binaryExtensions": [".exe", ".dll", ".png", ".jpg", ".pdf"],
   "replacements": [
     {
       "regex": false,
@@ -149,6 +152,7 @@ namechanger -c config.json --remove-empty-dirs
 | `excludes` | string[] | 否 | 要排除的目录名列表 |
 | `renameOnly` | boolean | 否 | 仅重命名文件，不替换文件内容（默认：false） |
 | `removeEmptyDirs` | boolean | 否 | 完成后移除空目录（默认：false） |
+| `binaryExtensions` | string[] | 否 | 二进制文件扩展名列表，跳过内容替换（默认：[]） |
 | `replacements` | array | **是** | 替换规则数组 |
 
 ### 替换规则
@@ -165,9 +169,11 @@ namechanger -c config.json --remove-empty-dirs
 
 - **文件重命名**: 根据替换规则批量重命名文件
 - **内容替换**: 在文件内容中查找并替换文本
+- **二进制文件保护**: 自动跳过二进制文件的内容替换
 - **正则支持**: 支持正则表达式进行复杂匹配
 - **路径处理**: 正确处理 Windows 和 Unix 路径分隔符
 - **安全排除**: 自动排除 node_modules、.git 等目录
+- **移除空目录**: 处理完成后自动清理空目录
 
 ## 示例
 

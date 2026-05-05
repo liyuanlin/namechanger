@@ -10,6 +10,7 @@
   ],
   "renameOnly": false,
   "removeEmptyDirs": false,
+  "binaryExtensions": [".exe", ".dll", ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".zip"],
   "replacements": [
     {
       "regex": false,
